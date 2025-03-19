@@ -1,107 +1,85 @@
-# osTicket Installation Guide on Microsoft Azure
+# Installing osTicket on Windows 10
+
+Prerequisites and installation guide for Windows 10 systems.
 
 ## Prerequisites
-Before installing osTicket on Microsoft Azure, ensure that you have the following:
-
-- **Azure Virtual Machine (VM):** Running Ubuntu 22.04 (Recommended) or Windows Server (with IIS and PHP configured)
-- **Web Server:** Apache for Linux or IIS for Windows Server
-- **PHP:** Version 7.2 - 8.0 (Recommended: PHP 7.4)
-- **Database:** Azure Database for MySQL or MariaDB
-- **Required PHP Extensions:**
-  - `mysqli`
-  - `gd`
-  - `gettext`
-  - `imap`
-  - `json`
-  - `mbstring`
-  - `xml`
-  - `intl`
-  - `apcu` (recommended for caching)
+- Windows 10 OS
+- Internet Information Services (IIS)
+- [PHP Manager for IIS](https://www.iis.net/downloads/community/2018/05/php-manager-150-for-iis-10)
+- [Visual Studio Redistributable x86](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)
+- [MySQL](https://dev.mysql.com/downloads/installer/)
+- [IIS Rewrite Module](https://www.iis.net/downloads/microsoft/url-rewrite)
+- [HeidiSQL](https://www.heidisql.com/download.php)
+- [osTicket](https://osticket.com/download/)
 
 ## Installation Steps
+1. **Enable IIS on Windows 10 with CGI**
+   - Open PowerShell as Administrator and run:
+     ```powershell
+     Enable-WindowsOptionalFeature -Online -FeatureName IIS-WebServer -All
+     ```
+   - Go to Control Panel → Programs → Turn Windows features on or off.
+   - Expand **World Wide Web Services → Application Development Features**.
+   - Check **CGI**, then click OK and restart your computer.
 
-### Step 1: Set Up an Azure Virtual Machine
-1. Log in to [Azure Portal](https://portal.azure.com/).
-2. Create a new Virtual Machine (Ubuntu 22.04 or Windows Server).
-3. Choose an appropriate VM size (Standard B2s or higher recommended).
-4. Configure inbound security rules to allow HTTP (80) and HTTPS (443).
+2. **Install Required Components**
+   - Install **PHP Manager for IIS** (`PHPManagerForIIS_V1.5.0.msi`).
+   - Install **IIS Rewrite Module** (`rewrite_amd64_en-US.msi`).
+   - Install **Visual C++ Redistributable** (`VC_redist.x86.exe`).
 
-### Step 2: Install Required Software
-For Ubuntu:
-```sh
-sudo apt update && sudo apt upgrade -y
-sudo apt install apache2 php php-mysqli php-gd php-gettext php-imap php-json php-mbstring php-xml php-intl php-apcu unzip -y
-```
+3. **Set Up PHP for IIS**
+   - Create a directory `C:\PHP`.
+   - Download and extract **PHP NTS** to `C:\PHP`.
+   - Open IIS Manager → Select your server → Open **PHP Manager**.
+   - Register PHP by setting the path to `C:\PHP\php-cgi.exe`.
+   - Restart IIS (`iisreset` in PowerShell or stop/start IIS manually).
 
-For Windows Server, install IIS and PHP using the Web Platform Installer.
+4. **Install MySQL and Configure Database**
+   - Install **MySQL**.
+   - Choose **Typical Setup** and launch the **Configuration Wizard** after installation.
+   - Select **Standard Configuration** and set an username and password.
+   - Install **HeidiSQL**, open it, and create a new session with MySQL username and password.
+   - Create a database called `osticket`.
 
-### Step 3: Download osTicket
-Download the latest stable release of osTicket from the official website:
-[osTicket Downloads](https://osticket.com/download/)
+5. **Install osTicket**
+   - Extract **osTicket .zip folder**.
+   - Copy the `upload` folder to `C:\inetpub\wwwroot` and rename it to `osTicket`.
+   - Open IIS Manager → Sites → Default Web Site → osTicket.
+   - Click **Browse *:80** to open the osTicket checklist in your browser.
 
-Extract and move it to the web root:
-```sh
-wget https://github.com/osTicket/osTicket/releases/latest/download/osTicket-v1.17.zip
-unzip osTicket-v1.17.zip -d /var/www/html/osticket
-```
+6. **Enable Required PHP Extensions**
+   - Open IIS Manager → Sites → Default Web Site → osTicket.
+   - Open **PHP Manager** → Click **Enable or disable an extension**.
+   - Enable:
+     - `php_imap.dll`
+     - `php_intl.dll`
+     - `php_opcache.dll`
+   - Refresh the osTicket site in your browser to confirm extensions have been enabled.
 
-### Step 4: Set File Permissions
-Ensure the following directories are writable:
-```sh
-sudo chmod -R 755 /var/www/html/osticket
-sudo chmod 664 /var/www/html/osticket/include/ost-config.php
-sudo chown www-data:www-data /var/www/html/osticket/include/ost-config.php
-```
+7. **Configure osTicket Files**
+   - Rename `C:\inetpub\wwwroot\osTicket\include\ost-sampleconfig.php` to `ost-config.php`
+   - Right-click the file → **Properties** → **Security** → **Advanced**.
+   - Disable inheritance, remove all permissions, and add **Everyone** with full control.
+   - *Only allow permissions to authorized personnel*
 
-### Step 5: Create an Azure Database for MySQL
-1. In the Azure portal, create an **Azure Database for MySQL**.
-2. Configure firewall rules to allow connections from your VM.
-3. Run the following commands to create the database:
-```sh
-mysql -h your-mysql-server.mysql.database.azure.com -u osticket_user -p
-CREATE DATABASE osticket;
-GRANT ALL PRIVILEGES ON osticket.* TO 'osticket_user'@'your-vm-ip' IDENTIFIED BY 'secure_password';
-FLUSH PRIVILEGES;
-EXIT;
-```
+8. **Complete osTicket Setup in the Browser**
+   - Click **Continue** and set up the helpdesk name and default email.
+   - Provide the database details:
+     - MySQL Database: `osticket`
+     - MySQL Username: `default`
+     - MySQL Password: `default`
+   - Click **Install Now!**
 
-### Step 6: Configure osTicket
-1. Open your browser and go to:
-   ```
-   http://your-vm-ip/osticket/setup/
-   ```
-2. Follow the on-screen instructions to complete installation.
+## Post-Installation
+Once installed, you can access the osTicket admin panel at:
 
-### Step 7: Finalize Installation
-1. Remove the setup directory:
-```sh
-sudo rm -rf /var/www/html/osticket/setup/
-```
-2. Revert permissions for `ost-config.php`:
-```sh
-sudo chmod 644 /var/www/html/osticket/include/ost-config.php
-sudo chown www-data:www-data /var/www/html/osticket/include/ost-config.php
-```
-3. Restart Apache:
-```sh
-sudo systemctl restart apache2
-```
+[http://localhost/osticket/scp/](http://localhost/osticket/scp/)
 
-### Step 8: Access osTicket Admin Panel
-- Navigate to:
-  ```
-  http://your-vm-ip/osticket/scp/
-  ```
-- Default Admin Credentials (Change after first login!):
-  - **Username:** `admin`
-  - **Password:** `admin`
+## Troubleshooting
+If you encounter issues, ensure:
+- IIS and MySQL are running.
+- PHP is correctly mapped in IIS.
+- Required PHP extensions are enabled.
+- The `setup` directory is deleted after installation.
+- File permissions are correctly assigned to `ost-config.php`.
 
-## Additional Configuration
-- Set up email piping for ticket creation.
-- Configure Azure cron jobs for automated tasks. Example:
-  ```sh
-  echo "* * * * * www-data php /var/www/html/osticket/api/cron.php" | sudo tee -a /etc/crontab > /dev/null
-  ```
-- Install language packs if needed.
-
-For more details, refer to the [osTicket Documentation](https://docs.osticket.com/).
