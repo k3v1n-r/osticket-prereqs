@@ -18,6 +18,7 @@ Prerequisites and installation guide for Windows 10 systems.
 ## Installation Steps
 1. **Enable IIS on Windows 10 with CGI**
    - Go to Control Panel → Programs → Programs and Features → Turn Windows features on or off
+   ![Guide Image]()
    - Enable **Internet Information Services**.
    - Expand **Internet Information Services → World Wide Web Services → Application Development Features**.
    - Check **CGI**, then click OK and restart your computer.
