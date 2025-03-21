@@ -2,16 +2,18 @@
 
 Prerequisites and installation guide for Windows 10 systems.
 
-## Prerequisites
+## Operating Systems 
 - Windows 10 OS
+  
+## Prerequisites'
 - Internet Information Services (IIS)
-- [PHP Manager for IIS](https://www.iis.net/downloads/community/2018/05/php-manager-150-for-iis-10)
-- [PHP](https://windows.php.net/download/)
-- [Visual Studio Redistributable x86](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)
-- [MySQL](https://dev.mysql.com/downloads/installer/)
-- [IIS Rewrite Module](https://www.iis.net/downloads/microsoft/url-rewrite)
-- [HeidiSQL](https://www.heidisql.com/download.php)
-- [osTicket](https://osticket.com/download/)
+- [PHP Manager for IIS 1.5.0](https://github.com/RonaldCarter/PHPManager/releases)
+- [PHP 7.3.8](https://drive.google.com/file/d/1-2YCXqRO4gnxIb3RFembWDunQp2M2ckT/view?usp=drive_link)
+- [Visual Studio Redistributable x86 2015-2022](https://drive.google.com/file/d/1s1OsGF3-ioO0_9LYizPRiVuIkb3lFJgH/view)
+- [MySQL 5.5.62](https://drive.google.com/file/d/1_OWh9p7VQLcrB0q_V7qT8yHl0xo5gv7z/view?usp=share_link)
+- [IIS Rewrite Module](https://drive.google.com/file/d/1-5dBgKmMcfmbU2wdlcAkjrzfUIrbUW8y/view)
+- [HeidiSQL 12.3.0.6589](https://www.google.com/url?q=https://www.heidisql.com/installers/HeidiSQL_12.3.0.6589_Setup.exe&sa=D&source=docs&ust=1742585174925249&usg=AOvVaw04gbDP2ul5D0JTS6D-3SVn)
+- [osTicket 1.15.8](https://drive.google.com/file/d/1-FF0ZwqQXqzOhMXlgWQ7CSBRWEMNwr7i/view?usp=drive_link)
 
 ## Installation Steps
 1. **Enable IIS on Windows 10 with CGI**
@@ -21,26 +23,26 @@ Prerequisites and installation guide for Windows 10 systems.
    - Check **CGI**, then click OK and restart your computer.
 
 3. **Install Required Components**
-   - Install **PHP Manager for IIS** (`PHPManagerForIIS_V1.5.0.msi`).
-   - Install **IIS Rewrite Module** (`rewrite_amd64_en-US.msi`).
-   - Install **Visual C++ Redistributable** (`VC_redist.x86.exe`).
+   - Install **PHP Manager for IIS**.
+   - Install **IIS Rewrite Module**.
+   - Install **Visual C++ Redistributable**.
 
 4. **Set Up PHP for IIS**
    - Create a directory `C:\PHP`.
-   - Download and extract **PHP NTS** to `C:\PHP`.
-   - Open IIS Manager → Select your server → Open **PHP Manager**.
+   - Extract `php-7.3.8-nts-Win32-VC15-x86.zip` to `C:\PHP`.
+   - Open **IIS Manager** → Select your server → Open **PHP Manager**.
    - Register PHP by setting the path to `C:\PHP\php-cgi.exe`.
    - Restart IIS (`iisreset` in PowerShell or stop/start IIS manually).
 
 5. **Install MySQL and Configure Database**
    - Install **MySQL**.
-   - Choose **Typical Setup** and launch the **Configuration Wizard** after installation. change this
+   - Choose **Typical Setup** and launch the **Configuration Wizard** after installation.
    - Select **Standard Configuration** and set an username and password.
    - Install **HeidiSQL**, open it, and create a new session with MySQL username and password.
    - Create a database called `osticket`.
 
 6. **Install osTicket**
-   - Extract **osTicket .zip folder**.
+   - Extract **osTicket `.zip` folder**.
    - Copy the `upload` folder to `C:\inetpub\wwwroot` and rename it to `osTicket`.
    - Open IIS Manager → Sites → Default Web Site → osTicket.
    - Click **Browse *:80** to open the osTicket checklist in your browser.
@@ -78,6 +80,5 @@ If you encounter issues, ensure:
 - IIS and MySQL are running.
 - PHP is correctly mapped in IIS.
 - Required PHP extensions are enabled.
-- The `setup` directory is deleted after installation.
 - File permissions are correctly assigned to `ost-config.php`.
 
